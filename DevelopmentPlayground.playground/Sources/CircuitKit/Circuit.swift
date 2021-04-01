@@ -1,5 +1,5 @@
 import Foundation
 
-protocol Impedance {
+class Circuit {
     
 }

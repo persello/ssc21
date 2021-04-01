@@ -1,6 +1,6 @@
 import Foundation
 
-public class Complex: CustomStringConvertible {
+public class Complex: CustomStringConvertible, Equatable {
     
     // MARK: - Internal representation
     
@@ -24,7 +24,7 @@ public class Complex: CustomStringConvertible {
         if let real = self._real,
            let imag = self._imaginary {
             self._modulus = sqrt(real * real + imag * imag)
-            self._argument = atan2(real, imag)
+            self._argument = atan2(imag, real)
         } else {
             self._modulus = 0
             self._argument = 0
@@ -177,16 +177,40 @@ public class Complex: CustomStringConvertible {
         return Complex(real: self.real, imaginary: -self.imaginary)
     }
     
-    public var description: String {
-        return "\(self.real) + j\(self.imaginary), (mod: \(self.modulus), arg: \(self.argument / .pi)π"
+    // MARK: - Protocol conformance
+    
+    // Equatable
+    public static func ==(_ lhs: Complex, _ rhs: Complex) -> Bool {
+        return (lhs.real == rhs.real && lhs.imaginary == rhs.imaginary) || (lhs.modulus == rhs.modulus && lhs.argument == rhs.argument)
     }
     
+    public static func ==(_ lhs: Double, _ rhs: Complex) -> Bool {
+        return Complex(real: lhs, imaginary: 0) == rhs
+    }
+    
+    public static func ==(_ lhs: Complex, _ rhs: Double) -> Bool {
+        return lhs == Complex(real: rhs, imaginary: 0)
+    }
+    
+    // CustomStringConvertible
+    public var description: String {
+        return "\(String(format: "%.3f", self.real)) + \(String(format: "%.3f", self.imaginary))j, (mod: \(String(format: "%.3f", self.modulus)), arg: \(String(format: "%.3f", self.argument / .pi))π)"
+    }
+    
+    // MARK: - Constants
+    
+    static let j = Complex(real: 0, imaginary: 1)
+    static let complexZero = Complex(real: 0, imaginary: 0)
 }
 
 extension Double {
     public var j: Complex {
         return Complex(real: 0, imaginary: self)
     }
-    
-    static var j: Complex = 1.0.j
+}
+
+extension Int {
+    public var j: Complex {
+        return Complex(real: 0, imaginary: Double(self))
+    }
 }
