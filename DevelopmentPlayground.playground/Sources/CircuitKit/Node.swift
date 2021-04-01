@@ -1,7 +1,7 @@
 import Foundation
 
 public final class Node: Identifiable {
-    internal init(name: String? = nil) {
+    public init(_ name: String? = nil) {
         id = UUID()
         self.name = name
         connections = []
@@ -13,7 +13,7 @@ public final class Node: Identifiable {
     public var id: UUID
 
     static var ground: Node {
-        let node = Node(name: "GND")
+        let node = Node("GND")
         node.voltage = Measurement(value: 0, unit: .volts)
         return node
     }

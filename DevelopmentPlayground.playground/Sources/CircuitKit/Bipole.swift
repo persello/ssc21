@@ -11,7 +11,7 @@ public class Bipole: Identifiable {
         self.nodeB = nodeB ?? Node()
     }
 
-    var nodeA: Node {
+    public var nodeA: Node {
         willSet {
             // Remove old
             nodeA.connections.removeAll(where: { $0 == (self, .pinA) })
@@ -21,7 +21,7 @@ public class Bipole: Identifiable {
         }
     }
 
-    var nodeB: Node {
+    public var nodeB: Node {
         willSet {
             // Remove old
             nodeB.connections.removeAll(where: { $0 == (self, .pinB) })

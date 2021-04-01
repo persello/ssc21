@@ -1,28 +1,33 @@
 import Foundation
 
+// MARK: - Extension for existing frequency unit
 extension UnitFrequency {
-    static var radiansPerSecond = UnitFrequency(symbol: "rad/s", converter: UnitConverterLinear(coefficient: 2 * .pi))
+    public static var radiansPerSecond = UnitFrequency(symbol: "rad/s", converter: UnitConverterLinear(coefficient: 2 * .pi))
 }
 
 // MARK: - Inductance and capacitance
 
-public class UnitInductance: Dimension {
-    static var henry = UnitInductance(symbol: "H", converter: UnitConverterLinear(coefficient: 1))
-    static var milliHenry = UnitInductance(symbol: "mH", converter: UnitConverterLinear(coefficient: 1e-3))
-    static var microHenry = UnitInductance(symbol: "µH", converter: UnitConverterLinear(coefficient: 1e-6))
-    static var nanoHenry = UnitInductance(symbol: "nH", converter: UnitConverterLinear(coefficient: 1e-9))
+public final class UnitInductance: Dimension {
+    public static let henry = UnitInductance(symbol: "H", converter: UnitConverterLinear(coefficient: 1.0))
+    public static let milliHenry = UnitInductance(symbol: "mH", converter: UnitConverterLinear(coefficient: 1.0e-3))
+    public static let microHenry = UnitInductance(symbol: "µH", converter: UnitConverterLinear(coefficient: 1.0e-6))
+    public static let nanoHenry = UnitInductance(symbol: "nH", converter: UnitConverterLinear(coefficient: 1.0e-9))
 
-    static let baseUnit = henry
+    public override class func baseUnit() -> UnitInductance {
+        return UnitInductance.henry
+    }
 }
 
-public class UnitCapacitance: Dimension {
-    static var farad = UnitCapacitance(symbol: "F", converter: UnitConverterLinear(coefficient: 1))
-    static var milliFarad = UnitCapacitance(symbol: "mF", converter: UnitConverterLinear(coefficient: 1e-3))
-    static var microFarad = UnitCapacitance(symbol: "µF", converter: UnitConverterLinear(coefficient: 1e-6))
-    static var nanoFarad = UnitCapacitance(symbol: "nF", converter: UnitConverterLinear(coefficient: 1e-9))
-    static var picoFarad = UnitCapacitance(symbol: "pF", converter: UnitConverterLinear(coefficient: 1e-12))
+public final class UnitCapacitance: Dimension {
+    public static let farad = UnitCapacitance(symbol: "F", converter: UnitConverterLinear(coefficient: 1.0))
+    public static let milliFarad = UnitCapacitance(symbol: "mF", converter: UnitConverterLinear(coefficient: 1.0e-3))
+    public static let microFarad = UnitCapacitance(symbol: "µF", converter: UnitConverterLinear(coefficient: 1.0e-6))
+    public static let nanoFarad = UnitCapacitance(symbol: "nF", converter: UnitConverterLinear(coefficient: 1.0e-9))
+    public static let picoFarad = UnitCapacitance(symbol: "pF", converter: UnitConverterLinear(coefficient: 1.0e-12))
 
-    static let baseUnit = farad
+    public override class func baseUnit() -> UnitCapacitance {
+        return UnitCapacitance.farad
+    }
 }
 
 // MARK: - Voltage and current
