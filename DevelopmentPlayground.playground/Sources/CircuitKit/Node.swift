@@ -2,11 +2,11 @@ import Foundation
 
 public final class Node: Identifiable {
     internal init(name: String? = nil) {
-        self.id = UUID()
+        id = UUID()
         self.name = name
-        self.connections = []
+        connections = []
     }
-    
+
     public var name: String?
     public var voltage: Measurement<UnitElectricPotentialDifference>?
     public var connections: [(Bipole, Bipole.Pin)]

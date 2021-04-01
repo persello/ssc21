@@ -5,37 +5,37 @@ public class Bipole: Identifiable {
         case pinA
         case pinB
     }
-    
+
     public init(nodeA: Node? = nil, nodeB: Node? = nil) {
         self.nodeA = nodeA ?? Node()
         self.nodeB = nodeB ?? Node()
     }
-    
+
     var nodeA: Node {
         willSet {
             // Remove old
-            nodeA.connections.removeAll(where: {$0 == (self, .pinA)})
-            
+            nodeA.connections.removeAll(where: { $0 == (self, .pinA) })
+
             // Add new
             newValue.connections.append((self, .pinA))
         }
     }
-    
+
     var nodeB: Node {
         willSet {
             // Remove old
-            nodeB.connections.removeAll(where: {$0 == (self, .pinB)})
-            
+            nodeB.connections.removeAll(where: { $0 == (self, .pinB) })
+
             // Add new
             newValue.connections.append((self, .pinB))
         }
     }
-    
+
     public var id = UUID()
-    
+
     deinit {
-        self.nodeA.connections.removeAll(where: {$0.0 == self})
-        self.nodeB.connections.removeAll(where: {$0.0 == self})
+        self.nodeA.connections.removeAll(where: { $0.0 == self })
+        self.nodeB.connections.removeAll(where: { $0.0 == self })
     }
 }
 

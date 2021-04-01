@@ -4,12 +4,33 @@ extension UnitFrequency {
     static var radiansPerSecond = UnitFrequency(symbol: "rad/s", converter: UnitConverterLinear(coefficient: 2 * .pi))
 }
 
+// MARK: - Inductance and capacitance
+
+public class UnitInductance: Dimension {
+    static var henry = UnitInductance(symbol: "H", converter: UnitConverterLinear(coefficient: 1))
+    static var milliHenry = UnitInductance(symbol: "mH", converter: UnitConverterLinear(coefficient: 1e-3))
+    static var microHenry = UnitInductance(symbol: "µH", converter: UnitConverterLinear(coefficient: 1e-6))
+    static var nanoHenry = UnitInductance(symbol: "nH", converter: UnitConverterLinear(coefficient: 1e-9))
+
+    static let baseUnit = henry
+}
+
+public class UnitCapacitance: Dimension {
+    static var farad = UnitCapacitance(symbol: "F", converter: UnitConverterLinear(coefficient: 1))
+    static var milliFarad = UnitCapacitance(symbol: "mF", converter: UnitConverterLinear(coefficient: 1e-3))
+    static var microFarad = UnitCapacitance(symbol: "µF", converter: UnitConverterLinear(coefficient: 1e-6))
+    static var nanoFarad = UnitCapacitance(symbol: "nF", converter: UnitConverterLinear(coefficient: 1e-9))
+    static var picoFarad = UnitCapacitance(symbol: "pF", converter: UnitConverterLinear(coefficient: 1e-12))
+
+    static let baseUnit = farad
+}
+
 // MARK: - Voltage and current
 
 protocol Sinusoidal: CustomStringConvertible {
     var omega: Measurement<UnitFrequency> { get set }
     var value: Complex { get set }
-    
+
     associatedtype AssociatedUnit: Dimension
     static var displayUnit: AssociatedUnit { get set }
 }
@@ -18,11 +39,11 @@ extension Sinusoidal {
     var phase: Measurement<UnitAngle> {
         return Measurement<UnitAngle>(value: value.argument, unit: .radians)
     }
-    
+
     var peak: Measurement<AssociatedUnit> {
         return Measurement<AssociatedUnit>(value: value.modulus, unit: Self.displayUnit)
     }
-    
+
     var rms: Measurement<AssociatedUnit> {
         return Measurement<AssociatedUnit>(value: value.modulus / 2.squareRoot(), unit: Self.displayUnit)
     }
@@ -38,20 +59,20 @@ extension Sinusoidal {
 public struct Voltage: Sinusoidal {
     public var omega: Measurement<UnitFrequency>
     public var value: Complex
-    
+
     static var displayUnit: UnitElectricPotentialDifference = .volts
     public typealias AssociatedUnit = UnitElectricPotentialDifference
-    
+
     public init(peak: Measurement<AssociatedUnit>, phase: Measurement<UnitAngle>, omega: Measurement<UnitFrequency>) {
         self.omega = omega
         value = Complex(modulus: peak.converted(to: Self.displayUnit).value, argument: phase.converted(to: .radians).value)
     }
-    
+
     public init(rms: Measurement<AssociatedUnit>, phase: Measurement<UnitAngle>, omega: Measurement<UnitFrequency>) {
         self.omega = omega
         value = Complex(modulus: rms.converted(to: Self.displayUnit).value * 2.squareRoot(), argument: phase.converted(to: .radians).value)
     }
-    
+
     public init(omega: Measurement<UnitFrequency>, value: Complex) {
         self.omega = omega
         self.value = value
@@ -61,20 +82,20 @@ public struct Voltage: Sinusoidal {
 public struct Current: Sinusoidal {
     public var omega: Measurement<UnitFrequency>
     public var value: Complex
-    
+
     static var displayUnit: UnitElectricCurrent = .amperes
     public typealias AssociatedUnit = UnitElectricCurrent
-    
+
     public init(peak: Measurement<AssociatedUnit>, phase: Measurement<UnitAngle>, omega: Measurement<UnitFrequency>) {
         self.omega = omega
         value = Complex(modulus: peak.converted(to: Self.displayUnit).value, argument: phase.converted(to: .radians).value)
     }
-    
+
     public init(rms: Measurement<AssociatedUnit>, phase: Measurement<UnitAngle>, omega: Measurement<UnitFrequency>) {
         self.omega = omega
         value = Complex(modulus: rms.converted(to: Self.displayUnit).value * 2.squareRoot(), argument: phase.converted(to: .radians).value)
     }
-    
+
     public init(omega: Measurement<UnitFrequency>, value: Complex) {
         self.omega = omega
         self.value = value
@@ -93,9 +114,9 @@ public struct Impedance: SupportsSeriesAndParallels, CustomStringConvertible {
     public init(value: Complex) {
         self.value = value
     }
-    
+
     public var value: Complex
-    
+
     public static func fromSeries(of items: [SupportsSeriesAndParallels]) -> Impedance {
         let totalImpedanceValue: Complex = items.map({ item -> Complex in
             if let admittance = item as? Admittance {
@@ -107,13 +128,13 @@ public struct Impedance: SupportsSeriesAndParallels, CustomStringConvertible {
                 return .complexZero
             }
         })
-        .reduce(.complexZero, { x, y in
-            x + y
-        })
-        
+            .reduce(.complexZero, { x, y in
+                x + y
+            })
+
         return Impedance(value: totalImpedanceValue)
     }
-    
+
     public static func fromParallel(of items: [SupportsSeriesAndParallels]) -> Impedance {
         let totalImpedanceValueInverse: Complex = items.map({ item -> Complex in
             if let admittance = item as? Admittance {
@@ -125,23 +146,23 @@ public struct Impedance: SupportsSeriesAndParallels, CustomStringConvertible {
                 return .complexZero
             }
         })
-        .reduce(.complexZero, { x, y in
-            if x == 0 {
-                return y
-            } else if y == 0 {
-                return x
-            } else {
-                return (1 / x) + (1 / y)
-            }
-        })
-        
+            .reduce(.complexZero, { x, y in
+                if x == 0 {
+                    return y
+                } else if y == 0 {
+                    return x
+                } else {
+                    return (1 / x) + (1 / y)
+                }
+            })
+
         return Impedance(value: 1 / totalImpedanceValueInverse)
     }
-    
+
     public func asAdmittance() -> Admittance {
         return Admittance(value: 1 / value)
     }
-    
+
     // CustomStringConvertible conformance
     public var description: String {
         return "\(value.description)Ω"
@@ -152,21 +173,21 @@ public struct Admittance: SupportsSeriesAndParallels, CustomStringConvertible {
     public init(value: Complex) {
         self.value = value
     }
-    
+
     public var value: Complex
-    
+
     public static func fromSeries(of items: [SupportsSeriesAndParallels]) -> Admittance {
         Impedance.fromSeries(of: items).asAdmittance()
     }
-    
+
     public static func fromParallel(of items: [SupportsSeriesAndParallels]) -> Admittance {
         Impedance.fromParallel(of: items).asAdmittance()
     }
-    
+
     public func asImpedance() -> Impedance {
         return Impedance(value: 1 / value)
     }
-    
+
     // CustomStringConvertible conformance
     public var description: String {
         return "\(value.description)S"
@@ -183,27 +204,25 @@ public struct Admittance: SupportsSeriesAndParallels, CustomStringConvertible {
 // V = I/Y -------------------
 // Y = I/V
 
-
-
 // V = I * Z
 // V = Z * I
 
 // Y = I / V
 // V = I / Y
 extension Current {
-    static public func *(_ lhs: Current, _ rhs: Impedance) -> Voltage {
+    public static func * (_ lhs: Current, _ rhs: Impedance) -> Voltage {
         return Voltage(omega: lhs.omega, value: lhs.value * rhs.value)
     }
-    
-    static public func *(_ lhs: Impedance, _ rhs: Current) -> Voltage {
+
+    public static func * (_ lhs: Impedance, _ rhs: Current) -> Voltage {
         return rhs * lhs
     }
-    
-    static public func /(_ lhs: Current, _ rhs: Voltage) -> Admittance {
+
+    public static func / (_ lhs: Current, _ rhs: Voltage) -> Admittance {
         return Admittance(value: lhs.value / rhs.value)
     }
-    
-    static public func /(_ lhs: Current, _ rhs: Admittance) -> Voltage {
+
+    public static func / (_ lhs: Current, _ rhs: Admittance) -> Voltage {
         return Voltage(omega: lhs.omega, value: lhs.value / rhs.value)
     }
 }
@@ -214,19 +233,19 @@ extension Current {
 // Z = V / I
 // I = V / Z
 extension Voltage {
-    static public func *(_ lhs: Voltage, _ rhs: Admittance) -> Current {
+    public static func * (_ lhs: Voltage, _ rhs: Admittance) -> Current {
         return Current(omega: lhs.omega, value: lhs.value * rhs.value)
     }
-    
-    static public func *(_ lhs: Admittance, _ rhs: Voltage) -> Current {
+
+    public static func * (_ lhs: Admittance, _ rhs: Voltage) -> Current {
         return rhs * lhs
     }
-    
-    static public func /(_ lhs: Voltage, _ rhs: Current) -> Impedance {
+
+    public static func / (_ lhs: Voltage, _ rhs: Current) -> Impedance {
         return Impedance(value: lhs.value / rhs.value)
     }
-    
-    static public func /(_ lhs: Voltage, _ rhs: Impedance) -> Current {
+
+    public static func / (_ lhs: Voltage, _ rhs: Impedance) -> Current {
         return Current(omega: lhs.omega, value: lhs.value / rhs.value)
     }
 }
