@@ -1,5 +1,9 @@
 import Foundation
+import simd
 
-class Circuit {
+public class Circuit<Component: Bipole> {
+    var nodes = Set<Node>()
+    var components = Set<Component>()
+    
     
 }
