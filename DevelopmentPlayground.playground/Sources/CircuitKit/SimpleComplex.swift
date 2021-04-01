@@ -1,6 +1,6 @@
 import Foundation
 
-public class Complex: CustomStringConvertible, Equatable {
+public final class Complex: CustomStringConvertible, Equatable {
     
     // MARK: - Internal representation
     

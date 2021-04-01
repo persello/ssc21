@@ -1,6 +1,6 @@
 import Foundation
 
-public class Node: Identifiable {
+public final class Node: Identifiable {
     internal init(name: String? = nil) {
         self.id = UUID()
         self.name = name

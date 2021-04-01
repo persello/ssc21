@@ -51,9 +51,14 @@ public struct Voltage: Sinusoidal {
         self.omega = omega
         value = Complex(modulus: rms.converted(to: Self.displayUnit).value * 2.squareRoot(), argument: phase.converted(to: .radians).value)
     }
+    
+    public init(omega: Measurement<UnitFrequency>, value: Complex) {
+        self.omega = omega
+        self.value = value
+    }
 }
 
-struct Current: Sinusoidal {
+public struct Current: Sinusoidal {
     public var omega: Measurement<UnitFrequency>
     public var value: Complex
     
@@ -68,6 +73,11 @@ struct Current: Sinusoidal {
     public init(rms: Measurement<AssociatedUnit>, phase: Measurement<UnitAngle>, omega: Measurement<UnitFrequency>) {
         self.omega = omega
         value = Complex(modulus: rms.converted(to: Self.displayUnit).value * 2.squareRoot(), argument: phase.converted(to: .radians).value)
+    }
+    
+    public init(omega: Measurement<UnitFrequency>, value: Complex) {
+        self.omega = omega
+        self.value = value
     }
 }
 
@@ -160,5 +170,63 @@ public struct Admittance: SupportsSeriesAndParallels, CustomStringConvertible {
     // CustomStringConvertible conformance
     public var description: String {
         return "\(value.description)S"
+    }
+}
+
+// MARK: - Operations between units
+
+// V = ZI = IZ --------------- OK
+// Z = V/I ------------------- OK
+// I = V/Z ------------------- OK
+
+// I = YV = VY --------------- OK
+// V = I/Y -------------------
+// Y = I/V
+
+
+
+// V = I * Z
+// V = Z * I
+
+// Y = I / V
+// V = I / Y
+extension Current {
+    static public func *(_ lhs: Current, _ rhs: Impedance) -> Voltage {
+        return Voltage(omega: lhs.omega, value: lhs.value * rhs.value)
+    }
+    
+    static public func *(_ lhs: Impedance, _ rhs: Current) -> Voltage {
+        return rhs * lhs
+    }
+    
+    static public func /(_ lhs: Current, _ rhs: Voltage) -> Admittance {
+        return Admittance(value: lhs.value / rhs.value)
+    }
+    
+    static public func /(_ lhs: Current, _ rhs: Admittance) -> Voltage {
+        return Voltage(omega: lhs.omega, value: lhs.value / rhs.value)
+    }
+}
+
+// I = V * Y
+// I = Y * V
+
+// Z = V / I
+// I = V / Z
+extension Voltage {
+    static public func *(_ lhs: Voltage, _ rhs: Admittance) -> Current {
+        return Current(omega: lhs.omega, value: lhs.value * rhs.value)
+    }
+    
+    static public func *(_ lhs: Admittance, _ rhs: Voltage) -> Current {
+        return rhs * lhs
+    }
+    
+    static public func /(_ lhs: Voltage, _ rhs: Current) -> Impedance {
+        return Impedance(value: lhs.value / rhs.value)
+    }
+    
+    static public func /(_ lhs: Voltage, _ rhs: Impedance) -> Current {
+        return Current(omega: lhs.omega, value: lhs.value / rhs.value)
     }
 }
