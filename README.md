@@ -14,3 +14,8 @@ Generators at different frequencies (in the same circuit) can be analyzed separa
 that would allow to determine the circuit's response to an arbitrary input waveform.
 
 This needs **lots** of investigation and testing. Performance hits on larger circuits might be noticeable. This library is a purely educational project.
+
+## License
+The underlying library is licensed under the MIT license.
+
+The playground itself, excluding the part of the before described simulation library, is copyrighted. ©2021 Riccardo Persello
