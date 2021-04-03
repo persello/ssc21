@@ -18,4 +18,4 @@ This needs **lots** of investigation and testing. Performance hits on larger cir
 ## License
 The underlying library is licensed under the MIT license.
 
-The playground itself, excluding the part of the before described simulation library, is copyrighted. ©2021 Riccardo Persello
+The playground itself, excluding the part of the before described simulation library, is copyrighted. You shall not re-submit this entry or to copy it in the context of future Swift Student Challenges, but you're free to download and use this playground for testing purposes. ©2021 Riccardo Persello
