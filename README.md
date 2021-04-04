@@ -15,7 +15,9 @@ that would allow to determine the circuit's response to an arbitrary input wavef
 
 This needs **lots** of investigation and testing. Performance hits on larger circuits might be noticeable. This library is a purely educational project.
 
+It will be published as a Swift package when I have time.
+
 ## License
-The underlying library is licensed under the MIT license.
+The underlying library (CircuitKit) is licensed under the MIT license.
 
 The playground itself, excluding the part of the before described simulation library, is copyrighted. You shall not re-submit this entry or to copy it in the context of future Swift Student Challenges, but you're free to download and use this playground for testing purposes. ©2021 Riccardo Persello
