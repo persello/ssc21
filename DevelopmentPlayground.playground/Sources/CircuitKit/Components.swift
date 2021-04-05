@@ -1,9 +1,12 @@
 import Foundation
 
+// TODO: Implement multiplication and division with this type with automatic frequency capture.
+typealias ComputableImpedance = (Measurement<UnitFrequency>) -> Impedance
+
 // MARK: - Protocol
 
 protocol LinearComponent {
-    var impedance: (Measurement<UnitFrequency>) -> Impedance { get }
+    var impedance: ComputableImpedance { get }
 }
 
 // MARK: - Passive components
