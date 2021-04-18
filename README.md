@@ -3,6 +3,8 @@
 
 This is my entry for the 2021 Swift Student Challenge. 
 
+Get the [CircuitKit library](https://github.com/persello/CircuitKit).
+
 ## The project
 It's a simple passive circuit simulator that supports resistors, capacitors and inductors.
 It can do simple simulations with AC current generators, but every one should be set at the same frequency. It can also be used as a DC simulator, but it won't take into account the transient period.
