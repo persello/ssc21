@@ -2,7 +2,7 @@ import Foundation
 
 // MARK: - Extension for existing frequency unit
 extension UnitFrequency {
-    public static var radiansPerSecond = UnitFrequency(symbol: "rad/s", converter: UnitConverterLinear(coefficient: 2 * .pi))
+    public static var radiansPerSecond = UnitFrequency(symbol: "rad/s", converter: UnitConverterLinear(coefficient: 1 / (2 * .pi)))
 }
 
 // MARK: - Inductance and capacitance
@@ -32,7 +32,7 @@ public final class UnitCapacitance: Dimension {
 
 // MARK: - Voltage and current
 
-protocol Sinusoidal: CustomStringConvertible {
+protocol Sinusoidal: CustomStringConvertible, Equatable {
     var omega: Measurement<UnitFrequency> { get set }
     var value: Complex { get set }
 
@@ -41,6 +41,28 @@ protocol Sinusoidal: CustomStringConvertible {
 }
 
 extension Sinusoidal {
+    public static func - (_ lhs: Self, _ rhs: Self) -> Self {
+        var result = lhs
+        result.value = lhs.value - rhs.value
+        return result
+    }
+    
+    public static func + (_ lhs: Self, _ rhs: Self) -> Self {
+        var result = lhs
+        result.value = lhs.value + rhs.value
+        return result
+    }
+    
+    public static prefix func -(_ lhs: Self) -> Self {
+        var result = lhs
+        result.value = -lhs.value
+        return result
+    }
+    
+    public static func == (_ lhs: Self, _ rhs: Self) -> Bool {
+        return (lhs.value == rhs.value && lhs.omega == rhs.omega)
+    }
+
     var phase: Measurement<UnitAngle> {
         return Measurement<UnitAngle>(value: value.argument, unit: .radians)
     }
@@ -54,10 +76,11 @@ extension Sinusoidal {
     }
 }
 
-// CustomStringConvertible conformance
 extension Sinusoidal {
     public var description: String {
-        return "\(peak) peak @ \(omega.converted(to: .hertz)) with \(phase.converted(to: .degrees)) phase"
+        let formatter = MeasurementFormatter()
+        formatter.numberFormatter.maximumFractionDigits = 3
+        return "\(formatter.string(from: peak)) peak @ \(formatter.string(from: omega.converted(to: .hertz))) with \(formatter.string(from: phase.converted(to: .degrees))) phase"
     }
 }
 
@@ -130,10 +153,10 @@ public struct Impedance: SupportsSeriesAndParallels, CustomStringConvertible {
                 return impedance.value
             } else {
                 print("You have defined a new serial/parallel unit without implementing its conversion!")
-                return .complexZero
+                return .zero
             }
         })
-            .reduce(.complexZero, { x, y in
+            .reduce(.zero, { x, y in
                 x + y
             })
 
@@ -148,10 +171,10 @@ public struct Impedance: SupportsSeriesAndParallels, CustomStringConvertible {
                 return impedance.value
             } else {
                 print("You have defined a new serial/parallel unit without implementing its conversion!")
-                return .complexZero
+                return .zero
             }
         })
-            .reduce(.complexZero, { x, y in
+            .reduce(.zero, { x, y in
                 if x == 0 {
                     return y
                 } else if y == 0 {
@@ -201,14 +224,6 @@ public struct Admittance: SupportsSeriesAndParallels, CustomStringConvertible {
 
 // MARK: - Operations between units
 
-// V = ZI = IZ --------------- OK
-// Z = V/I ------------------- OK
-// I = V/Z ------------------- OK
-
-// I = YV = VY --------------- OK
-// V = I/Y -------------------
-// Y = I/V
-
 // V = I * Z
 // V = Z * I
 
@@ -254,3 +269,4 @@ extension Voltage {
         return Current(omega: lhs.omega, value: lhs.value / rhs.value)
     }
 }
+

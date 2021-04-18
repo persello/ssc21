@@ -1,14 +1,24 @@
 import Foundation
 
 public class Bipole: Identifiable {
+    static var globalID: Int = 0
+    
     public enum Pin {
         case pinA
         case pinB
     }
 
     public init(nodeA: Node? = nil, nodeB: Node? = nil) {
+        
+        self.id = Bipole.globalID
+        Bipole.globalID += 1
+        
         self.nodeA = nodeA ?? Node()
         self.nodeB = nodeB ?? Node()
+        
+        // willSet first init fix
+        self.nodeA.connections.append((self, .pinA))
+        self.nodeB.connections.append((self, .pinB))
     }
 
     public var nodeA: Node {
@@ -30,12 +40,24 @@ public class Bipole: Identifiable {
             newValue.connections.append((self, .pinB))
         }
     }
+    
+    public var current: Current?
+    public var voltage: Voltage? {
+        if let vA = nodeA.voltage,
+           let vB = nodeB.voltage {
+            return vA - vB
+        }
+        
+        return nil
+    }
 
-    public var id = UUID()
+    public var id: Int
 
     deinit {
         self.nodeA.connections.removeAll(where: { $0.0 == self })
         self.nodeB.connections.removeAll(where: { $0.0 == self })
+        
+        // Do not delete ID, no need to do it
     }
 }
 

@@ -1,17 +1,37 @@
 import Foundation
 
 // TODO: Implement multiplication and division with this type with automatic frequency capture.
-typealias ComputableImpedance = (Measurement<UnitFrequency>) -> Impedance
+public typealias ComputableImpedance = (Measurement<UnitFrequency>) -> Impedance
 
 // MARK: - Protocol
 
-protocol LinearComponent {
+protocol ComponentWithComputableImpedance {
     var impedance: ComputableImpedance { get }
+}
+
+// MARK: - Operations with computable impedance
+// V = I * Z
+// V = Z * I
+extension Current {
+    public static func * (_ lhs: Current, _ rhs: ComputableImpedance) -> Voltage {
+        return lhs * rhs(lhs.omega)
+    }
+
+    public static func * (_ lhs: ComputableImpedance, _ rhs: Current) -> Voltage {
+        return rhs * lhs
+    }
+}
+
+// I = V / Z
+extension Voltage {
+    public static func / (_ lhs: Voltage, _ rhs: ComputableImpedance) -> Current {
+        lhs / rhs(lhs.omega)
+    }
 }
 
 // MARK: - Passive components
 
-public final class Resistor: Bipole, LinearComponent {
+public final class Resistor: Bipole, ComponentWithComputableImpedance {
     
     public init(resistance: Measurement<UnitElectricResistance>, between nodeA: Node? = nil, and nodeB: Node? = nil) {
         self.resistance = resistance
@@ -26,7 +46,7 @@ public final class Resistor: Bipole, LinearComponent {
     public var impedance: (Measurement<UnitFrequency>) -> Impedance
 }
 
-public final class Capacitor: Bipole, LinearComponent {
+public final class Capacitor: Bipole, ComponentWithComputableImpedance {
     public init(capacitance: Measurement<UnitCapacitance>, between nodeA: Node? = nil, and nodeB: Node? = nil) {
         self.capacitance = capacitance
         self.impedance = { omega in
@@ -41,7 +61,7 @@ public final class Capacitor: Bipole, LinearComponent {
     public var impedance: (Measurement<UnitFrequency>) -> Impedance
 }
 
-public final class Inductor: Bipole, LinearComponent {
+public final class Inductor: Bipole, ComponentWithComputableImpedance {
     public init(inductance: Measurement<UnitInductance>, between nodeA: Node? = nil, and nodeB: Node? = nil) {
         self.inductance = inductance
 

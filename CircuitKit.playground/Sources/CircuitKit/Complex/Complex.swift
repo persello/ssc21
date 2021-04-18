@@ -1,6 +1,7 @@
 import Foundation
 
-public final class Complex: CustomStringConvertible, Equatable {
+public final class Complex: AdditiveArithmetic, CustomStringConvertible, Equatable, ExpressibleByIntegerLiteral, ExpressibleByFloatLiteral {
+    
     // MARK: - Internal representation
 
     private var _real: Double?
@@ -123,7 +124,7 @@ public final class Complex: CustomStringConvertible, Equatable {
             return Complex(modulus: -mod, argument: arg)
         } else if let real = c._real,
                   let imag = c._imaginary {
-            return Complex(real: real, imaginary: imag)
+            return Complex(real: -real, imaginary: -imag)
         } else {
             return Complex(real: 0, imaginary: 0)
         }
@@ -182,7 +183,7 @@ public final class Complex: CustomStringConvertible, Equatable {
 
     // Equatable
     public static func == (_ lhs: Complex, _ rhs: Complex) -> Bool {
-        return (lhs.real == rhs.real && lhs.imaginary == rhs.imaginary) || (lhs.modulus == rhs.modulus && lhs.argument == rhs.argument)
+        return (lhs.real ≈≈ rhs.real && lhs.imaginary ≈≈ rhs.imaginary) || (lhs.modulus ≈≈ rhs.modulus && lhs.argument ≈≈ rhs.argument)
     }
 
     public static func == (_ lhs: Double, _ rhs: Complex) -> Bool {
@@ -195,23 +196,20 @@ public final class Complex: CustomStringConvertible, Equatable {
 
     // CustomStringConvertible
     public var description: String {
-        return "\(String(format: "%.3f", real)) + \(String(format: "%.3f", imaginary))j, (mod: \(String(format: "%.3f", modulus)), arg: \(String(format: "%.3f", argument / .pi))π)"
+        return "\(String(format: "%.4f", real))\(imaginary >= 0 ? "+" : "-")\(String(format: "%.4f", abs(imaginary)))j"
     }
 
     // MARK: - Constants
 
-    static let j = Complex(real: 0, imaginary: 1)
-    static let complexZero = Complex(real: 0, imaginary: 0)
-}
-
-extension Double {
-    public var j: Complex {
-        return Complex(real: 0, imaginary: self)
+    public static let j = Complex(real: 0, imaginary: 1)
+    public static let zero = Complex(real: 0, imaginary: 0)
+    
+    // MARK: - Expressible by literal conformance
+    public convenience init(integerLiteral value: Int) {
+        self.init(real: Double(value), imaginary: 0)
     }
-}
-
-extension Int {
-    public var j: Complex {
-        return Complex(real: 0, imaginary: Double(self))
+    
+    public convenience init(floatLiteral value: Double) {
+        self.init(real: value, imaginary: 0)
     }
 }
